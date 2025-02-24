@@ -1,0 +1,85 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+  # --------------  Prepare Firewalls  -------------- #
+  - name: "{{ env }} - Init MASTERS firewall"
+    vultr_firewall_group:
+      name: "{{ env }}_MASTERS"
+  - name: "{{ env }} - Create FW rules"
+    vultr_firewall_rule:
+      group: "{{ env }}_MASTERS"
+      protocol: "{{ item.proto }}"
+      port: "{{ item.port }}"
+      cidr: "{{ item.cidr }}"
+    with_items:
+    # Allow http
+    - port: 80
+      cidr: "0.0.0.0/0"
+      proto: tcp
+    # Allow https
+    - port: 443
+      cidr: "0.0.0.0/0"
+      proto: tcp
+    # SSH port
+    - port: 22
+      cidr: "0.0.0.0/0"
+      proto: tcp
+    # SSH port
+    - port: 65022
+      cidr: "0.0.0.0/0"
+      proto: tcp
+    # Nomad mgmt
+    - port: 4646
+      cidr: "0.0.0.0/0"
+      proto: tcp
+
+  - name: "{{ env }} - Init NODES firewall"
+    vultr_firewall_group:
+      name: "{{ env }}_NODES"
+  - name: "{{ env }} - Cretate NODES rules"
+    vultr_firewall_rule:
+      group: "{{ env }}_NODES"
+      protocol: "{{ item.proto }}"
+      port: "{{ item.port }}"
+      cidr: "{{ item.cidr }}"
+    with_items:
+    # Allow http
+    - port: 80
+      cidr: "0.0.0.0/0"
+      proto: tcp
+    # Allow https
+    - port: 433
+      cidr: "0.0.0.0/0"
+      proto: tcp
+    # SSH port
+    - port: 22
+      cidr: "0.0.0.0/0"
+      proto: tcp
+    # SSH port
+    - port: 65022
+      cidr: "0.0.0.0/0"
+      proto: tcp
+
+- hosts: cluster
+  gather_facts: no
+  pre_tasks:
+  - name: "{{ env }} - Cloud members are running"
+    local_action:
+      module: vultr_server
+      name: "{{ inventory_hostname_short }}"
+      os: "{{ os }}"
+      private_network_enabled: yes
+      plan: "{{ plan }}"
+      ssh_keys:
+      - marek
+      - github
+#      - "{{ root_keys }}"
+      firewall_group: "{{ firewall_grp }}"
+      region: "{{ region }}"
+      state: present
+
+- name: "Configure base servers"
+  ansible.builtin.import_playbook: deploy.yml
+
+- import_playbook: cloudflare_dns.yml

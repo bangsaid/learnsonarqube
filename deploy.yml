@@ -1,0 +1,70 @@
+---
+- hosts: cluster
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  pre_tasks:
+  - service_facts:
+    register: svc_list
+    tags: always
+  # - set_vars:
+  #     hosts_inventory: "{{ vars.hostvars }}"
+
+  tasks:
+  - name: Create /root/.docker directory
+    file:
+      path: /root/.docker
+      state: directory
+      mode: '0750'
+      owner: root
+    tags:
+    - docker
+  - name: Deploy /root/.docker/config.json
+    copy:
+      content: "{{ docker_config_json }}"
+      dest: /root/.docker/config.json
+      mode: '0600'
+      owner: root
+    tags:
+    - docker
+    when: docker_config_json
+#  - name: Install gotop
+#    unarchive:
+#      src: https://github.com/xxxserxxx/gotop/releases/download/v4.1.1/gotop_v4.1.1_linux_amd64.tgz
+#      dest: /usr/local/bin
+#      remote_src: yes
+#  - name: Install loki plugin to docker
+#    shell: "docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions; exit 0"
+  
+  roles:
+  - role: core
+    tags:
+    - core
+    - base
+  - role: users
+    tags:
+    - users
+    - base
+  - role: node_exporter
+    tags:
+    - monitoring
+    - node-exporter
+  - role: lynis
+    tags:
+    - security
+#  - role: promtail
+#    tags:
+#    - monitoring
+#    - promtail
+  - role: docker-ce
+    tags:
+    - docker
+#  - role: restic
+#    tags:
+#    - backup
+#    - restic
+#  - role: s3cmd
+#    tags:
+#    - backup
+
+- name: "{{ env }} Configure nomad"
+  import_playbook: nomad.yml

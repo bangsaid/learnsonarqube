@@ -1,0 +1,36 @@
+---
+- src: https://github.com/theztd/ans-core
+  version: master
+  name: core
+- src: https://github.com/theztd/ans-users
+  version: master
+  name: users
+- src: https://github.com/theztd/ans-prometheus
+  name: prometheus
+- src: https://github.com/theztd/ansible-node-exporter
+  name: node_exporter
+- src: https://github.com/theztd/ans-s3cmd
+  name: s3cmd
+- src: https://github.com/theztd/ans-restic.git
+  name: restic
+- src: https://github.com/theztd/ansible-grafana
+  name: grafana
+- src: https://github.com/theztd/ansible-mysqld_exporter
+  name: mysqld_exporter
+- src: https://github.com/geerlingguy/ansible-role-docker
+  name: docker-ce
+- src: https://github.com/ansible-community/ansible-consul.git
+  scm: git
+  name: consul
+#- src: https://github.com/theztd/ansible-nomad.git
+#  scm: git
+#  name: nomad
+- src: https://github.com/theztd/ans-nomad-cni.git
+  name: nomad-cni
+- src: https://github.com/geerlingguy/ansible-role-nginx.git
+  scm: git
+  name: nginx
+- src: https://github.com/infOpen/ansible-role-lynis.git
+  scm: git
+  name: lynis
+
