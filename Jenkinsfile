@@ -5,8 +5,8 @@ pipeline {
           stage("build & SonarQube") {
             agent any
             steps {
-              withSonarQubeEnv('SonarQube') {
-                sh 'mvn clean package sonar:sonar'
+              withSonarQubeEnv('SonarQube Server') {
+    sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=mostrans-php'
               }
             }
           }
